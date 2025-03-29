@@ -1,48 +1,48 @@
-import Description from './Description/Description';
-import Options from './Options/Options';
-import Feedback from './Feedback/Feedback';
-import Notification from './Notification/Notification';
+import Message from './Message/Message';
+import MoodOptions from './MoodOptions/MoodOptions';
+import MoodStats from './MoodStats/MoodStats';
+import Title from './Title/Title';
 import { useState, useEffect } from 'react';
-
 const App = () => {
-  const [feedback, setFeedback] = useState(() => {
-    const savedData = localStorage.getItem('feedback');
-    if (savedData) {
+  const [mood, setMood] = useState(() => {
+    const savedMood = localStorage.getItem('mood');
+    if (savedMood) {
       try {
-        return JSON.parse(savedData);
+        return JSON.parse(savedMood);
       } catch (error) {
-        console.error('Error parsing feedback from localStorage:', error);
-        return { good: 0, neutral: 0, bad: 0 };
+        console.error('Error parsing saved mood:', error);
+        return { happy: 0, okay: 0, sad: 0 };
       }
     }
-    return { good: 0, neutral: 0, bad: 0 };
+    return { happy: 0, okay: 0, sad: 0 };
   });
 
-  const updateFeedback = feedbackType => {
-    setFeedback(prev => ({
-      ...prev,
-      [feedbackType]: prev[feedbackType] + 1,
-    }));
+  const updateMood = moodType => {
+    setMood(prev => {
+      const updatedMood = { ...prev, [moodType]: prev[moodType] + 1 };
+      return updatedMood;
+    });
   };
 
-  const resetFeedback = () => {
-    const reset = { good: 0, neutral: 0, bad: 0 };
-    setFeedback(reset);
-  };
+  const total = mood.happy + mood.okay + mood.sad;
 
-  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-  const positiveFeedback = totalFeedback > 0 ? Math.round((feedback.good / totalFeedback) * 100) : 0;
+  const positive = Math.round((mood.happy / total) * 100);
+
+  const resetMood = () => {
+    const reset = { happy: 0, okay: 0, sad: 0 };
+    setMood(reset);
+  };
 
   useEffect(() => {
-    localStorage.setItem('feedback', JSON.stringify(feedback));
-  }, [feedback]);
+    localStorage.setItem('mood', JSON.stringify(mood));
+  }, [mood]);
 
   return (
-    <>
-      <Description />
-      <Options updateFeedback={updateFeedback} reset={resetFeedback} total={totalFeedback} />
-      {totalFeedback > 0 ? <Feedback feedback={feedback} total={totalFeedback} positive={positiveFeedback} /> : <Notification />}
-    </>
+    <div>
+      <Title />
+      <MoodOptions total={total} updateMood={updateMood} reset={resetMood} />
+      {total > 0 ? <MoodStats total={total} mood={mood} positive={positive} /> : <Message />}
+    </div>
   );
 };
 
