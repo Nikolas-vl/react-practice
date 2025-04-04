@@ -2,6 +2,7 @@ import Message from './Message/Message';
 import MoodOptions from './MoodOptions/MoodOptions';
 import MoodStats from './MoodStats/MoodStats';
 import Title from './Title/Title';
+import MainForm from './MainForm/MainForm';
 import { useState, useEffect } from 'react';
 const App = () => {
   const [mood, setMood] = useState(() => {
@@ -42,6 +43,7 @@ const App = () => {
       <Title />
       <MoodOptions total={total} updateMood={updateMood} reset={resetMood} />
       {total > 0 ? <MoodStats total={total} mood={mood} positive={positive} /> : <Message />}
+      <MainForm />
     </div>
   );
 };
