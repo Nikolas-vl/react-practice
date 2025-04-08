@@ -1,49 +1,28 @@
-import Message from './Message/Message';
-import MoodOptions from './MoodOptions/MoodOptions';
-import MoodStats from './MoodStats/MoodStats';
-import Title from './Title/Title';
-import MainForm from './MainForm/MainForm';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
 const App = () => {
-  const [mood, setMood] = useState(() => {
-    const savedMood = localStorage.getItem('mood');
-    if (savedMood) {
-      try {
-        return JSON.parse(savedMood);
-      } catch (error) {
-        console.error('Error parsing saved mood:', error);
-        return { happy: 0, okay: 0, sad: 0 };
-      }
-    }
-    return { happy: 0, okay: 0, sad: 0 };
-  });
+  const [posts, setPosts] = useState([
+    { id: 1, title: 'Пост 1', likes: 0 },
+    { id: 2, title: 'Пост 2', likes: 0 },
+    { id: 3, title: 'Пост 3', likes: 0 },
+  ]);
 
-  const updateMood = moodType => {
-    setMood(prev => {
-      const updatedMood = { ...prev, [moodType]: prev[moodType] + 1 };
-      return updatedMood;
-    });
+  const handleLike = postId => {
+    setPosts(prevPosts => prevPosts.map(post => (post.id === postId ? { ...post, likes: post.likes + 1 } : post)));
   };
-
-  const total = mood.happy + mood.okay + mood.sad;
-
-  const positive = Math.round((mood.happy / total) * 100);
-
-  const resetMood = () => {
-    const reset = { happy: 0, okay: 0, sad: 0 };
-    setMood(reset);
-  };
-
-  useEffect(() => {
-    localStorage.setItem('mood', JSON.stringify(mood));
-  }, [mood]);
 
   return (
     <div>
-      <Title />
-      <MoodOptions total={total} updateMood={updateMood} reset={resetMood} />
-      {total > 0 ? <MoodStats total={total} mood={mood} positive={positive} /> : <Message />}
-      <MainForm />
+      <h1>Posts</h1>
+      <ul>
+        {posts.map(post => (
+          <li key={post.id}>
+            <h2>{post.title}</h2>
+            <p>Likes: {post.likes}</p>
+            <button onClick={() => handleLike(post.id)}>Like!</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
